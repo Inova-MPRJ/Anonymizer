@@ -1,18 +1,14 @@
-from presidio_analyzer import AnalyzerEngine, RecognizerRegistry, PatternRecognizer
+from presidio_analyzer import AnalyzerEngine, RecognizerRegistry
 from presidio_anonymizer import AnonymizerEngine
 from presidio_analyzer.predefined_recognizers import SpacyRecognizer, EmailRecognizer, PhoneRecognizer
 from presidio_analyzer.nlp_engine import NlpEngineProvider
 from presidio_analyzer.recognizer_result import RecognizerResult
 
 from tools.recognizers.cpf import CPFRecognizer
-from tools.recognizers.escola import EscolaRecognizer
-from tools.recognizers.endereços import EnderecoRecognizer
+
+from API.config import LANGUAGES_CONFIG_FILE
 
 from typing import List
-from tools.agent import identificador_agent
-from config import AGENT, LANGUAGES_CONFIG_FILE
-
-
 
 # TODO Mover função para um arquivo separado
 def annotate(text: str, analyze_results: List[RecognizerResult]):
@@ -69,20 +65,16 @@ spacy_recognizer_pt = SpacyRecognizer(
 )
 
 cpf_recognizer = CPFRecognizer()
-escola_recognizer = EscolaRecognizer()
-endereco_recognizer = EnderecoRecognizer()
 # Create registry with both languages supported
 registry = RecognizerRegistry()
 registry.supported_languages = ["en", "pt"]
 
 # Add recognizers to registry
-# registry.add_recognizer(email_recognizer_en)
 registry.add_recognizer(email_recognizer_pt)
 registry.add_recognizer(phone_recognizer_pt)
 registry.add_recognizer(spacy_recognizer_pt)
 registry.add_recognizer(cpf_recognizer)
-registry.add_recognizer(escola_recognizer)
-registry.add_recognizer(endereco_recognizer)
+
 def anonymize_text(text):
     # Set up analyzer with our updated recognizer registry
     analyzer = AnalyzerEngine(
@@ -99,13 +91,5 @@ def anonymize_text(text):
     annotated_tokens = annotate(text=text, analyze_results=results)
     print(annotated_tokens)
 
-    if AGENT:
-        answer = identificador_agent(text, anonymized_text.text, annotated_tokens)
-    else:
-        answer = None
 
-
-    if answer != None:
-        return answer
-    else:
-        return anonymized_text.text
+    return anonymized_text.text

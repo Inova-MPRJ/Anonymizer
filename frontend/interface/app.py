@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import json
 from tools.csv_maker import preview_csv, create_results_dataframe, create_csv_content_for_download
+from frontend.config import API_BASE_URL
 
 class AnonimizationUI:
 
@@ -123,7 +124,7 @@ class AnonimizationUI:
                         
                         # Call CSV processing API
                         response = requests.post(
-                            "http://127.0.0.1:5000/upload_csv",
+                            f"{API_BASE_URL}/upload_csv",
                             files=files,
                             timeout=300  # 5 minutes timeout for CSV processing
                         )
@@ -139,7 +140,7 @@ class AnonimizationUI:
                             st.session_state.csv_processing = False
                             
                     except requests.exceptions.ConnectionError:
-                        st.error("❌ Erro: Não foi possível conectar à API. Certifique-se de que o servidor está rodando em http://127.0.0.1:5000/")
+                        st.error(f"❌ Erro: Não foi possível conectar à API. Certifique-se de que o servidor está rodando em {API_BASE_URL}/")
                         st.session_state.csv_processing = False
                     except requests.exceptions.Timeout:
                         st.error("❌ Erro: Timeout na requisição. O processamento está demorando muito.")
@@ -301,7 +302,7 @@ class AnonimizationUI:
                     try:
                         # Call the anonymization API
                         response = requests.post(
-                            "http://127.0.0.1:5000/",
+                            f"{API_BASE_URL}/",
                             json={"text": st_input_text},
                             timeout=30
                         )
@@ -319,7 +320,7 @@ class AnonimizationUI:
                             st.session_state.output_text = ""
                             
                     except requests.exceptions.ConnectionError:
-                        st.error("❌ Erro: Não foi possível conectar à API. Certifique-se de que o servidor está rodando em http://127.0.0.1:5000/")
+                        st.error(f"❌ Erro: Não foi possível conectar à API. Certifique-se de que o servidor está rodando em {API_BASE_URL}/")
                         st.session_state.processing = False
                         st.session_state.output_text = ""
                     except requests.exceptions.Timeout:
